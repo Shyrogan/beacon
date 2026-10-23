@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "beacon_extractor",
+  "version": "${version}",
+  "name": "Beacon Extractor",
+  "description": "Extracts the block-state light properties beacon needs",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.beacon.extractor.Main"]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~26.2",
+    "java": ">=25"
+  }
+}

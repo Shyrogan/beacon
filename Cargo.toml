@@ -1,0 +1,46 @@
+[package]
+name = "beacon"
+version = "0.1.0"
+edition = "2024"
+description = "A library for ChunkEdge."
+license = "MIT"
+
+[dependencies]
+# Shyrogan's fork: Minecraft 26.2 plus the owner's changes on main.
+chunkedge = { git = "https://github.com/Shyrogan/ChunkEdge", rev = "95339490269ed62201172b4a5410709c5ef3adb8" }
+bevy_tasks = "0.19.1"
+bevy_utils = "0.19.1"
+
+[build-dependencies]
+serde_json = "1"
+
+# Bevy's usual dev setup: optimise dependencies so debug builds stay playable.
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+# ChunkEdge's viewer count can underflow when a client disconnects; its
+# debug_assert would kill the debug server. Release builds don't check it.
+[profile.dev.package.chunkedge_server]
+debug-assertions = false
+
+[dev-dependencies]
+flate2 = "1"
+perf-event2 = "0.7.4"
+
+# ChunkEdge's block getters aren't #[inline]; without LTO every block read in
+# the light engine is a cross-crate call.
+[profile.release]
+lto = "fat"
+codegen-units = 1
+
+# For iterating on performance: thin LTO still inlines ChunkEdge into the
+# light engine, and rebuilds far faster than fat LTO.
+[profile.profiling]
+inherits = "release"
+lto = "thin"
+codegen-units = 16
+incremental = true
+debug = "line-tables-only"
